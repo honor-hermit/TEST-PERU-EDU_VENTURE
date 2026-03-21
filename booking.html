@@ -1,0 +1,777 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Book Your Trip · 예약하기 | Peru EduVenture</title>
+<link href="https://fonts.googleapis.com/css2?family=Playfair+Display:wght@700;900&family=DM+Sans:wght@300;400;500;600&family=Noto+Serif+KR:wght@400;700&display=swap" rel="stylesheet">
+<style>
+  :root {
+    --sun: #F5A623;
+    --earth: #C4703A;
+    --jungle: #2D6A4F;
+    --sky: #1A3A5C;
+    --cream: #FAF5EC;
+    --gold: #D4A847;
+    --snow: #FFFFFF;
+    --error: #e53e3e;
+    --success: #2D6A4F;
+  }
+
+  * { margin: 0; padding: 0; box-sizing: border-box; }
+  html { scroll-behavior: smooth; }
+  body {
+    font-family: 'DM Sans', sans-serif;
+    background: var(--cream);
+    color: var(--sky);
+    min-height: 100vh;
+  }
+
+  /* ── LANG BAR ── */
+  .lang-bar {
+    position: fixed; top: 0; left: 0; right: 0; z-index: 999;
+    display: flex; justify-content: space-between; align-items: center;
+    padding: 12px 32px;
+    background: rgba(26,58,92,0.95);
+    backdrop-filter: blur(10px);
+  }
+  .lang-bar .logo {
+    font-family: 'Playfair Display', serif;
+    color: var(--sun); font-size: 1.1rem; font-weight: 900;
+    text-decoration: none;
+  }
+  .lang-bar .logo span { color: #fff; }
+  .lang-btns { display: flex; gap: 10px; }
+  .lang-btn {
+    background: none; border: 1.5px solid rgba(255,255,255,0.4);
+    color: #fff; padding: 5px 16px; border-radius: 20px;
+    font-size: 0.82rem; cursor: pointer; letter-spacing: 0.05em;
+    transition: all 0.25s; font-family: 'DM Sans', 'Noto Serif KR', sans-serif;
+  }
+  .lang-btn.active, .lang-btn:hover { background: var(--gold); border-color: var(--gold); color: var(--sky); }
+
+  /* ── PAGE HEADER ── */
+  .page-header {
+    background: linear-gradient(135deg, var(--sky) 0%, #0f2234 100%);
+    padding: 100px 24px 50px;
+    text-align: center;
+  }
+  .page-header .breadcrumb {
+    font-size: 0.82rem; color: rgba(255,255,255,0.5);
+    margin-bottom: 16px;
+  }
+  .page-header .breadcrumb a { color: var(--sun); text-decoration: none; }
+  .page-header h1 {
+    font-family: 'Playfair Display', 'Noto Serif KR', serif;
+    font-size: clamp(2rem, 4.5vw, 3.2rem);
+    color: #fff; font-weight: 900;
+  }
+  .page-header p { color: rgba(255,255,255,0.7); margin-top: 10px; font-size: 1rem; }
+  .page-header .ko-p { font-family: 'Noto Serif KR', serif; font-size: 0.88rem; color: rgba(255,255,255,0.5); display: block; margin-top: 4px; }
+
+  /* ── BOOKING LAYOUT ── */
+  .booking-layout {
+    max-width: 1100px; margin: 0 auto;
+    display: grid; grid-template-columns: 1fr 380px;
+    gap: 32px; padding: 48px 24px;
+    align-items: start;
+  }
+  @media(max-width:800px) { .booking-layout { grid-template-columns: 1fr; } }
+
+  /* ── FORM CARD ── */
+  .form-card {
+    background: #fff; border-radius: 24px;
+    padding: 40px; box-shadow: 0 4px 40px rgba(26,58,92,0.1);
+  }
+  .form-section { margin-bottom: 36px; }
+  .form-section-title {
+    font-family: 'Playfair Display', serif;
+    font-size: 1.25rem; color: var(--sky); font-weight: 900;
+    margin-bottom: 4px; display: flex; align-items: center; gap: 10px;
+  }
+  .form-section-title .ko-fs {
+    font-family: 'Noto Serif KR', serif;
+    font-size: 0.75em; color: var(--earth); font-weight: 700;
+  }
+  .form-divider { height: 1px; background: rgba(26,58,92,0.08); margin: 16px 0 24px; }
+
+  .form-row { display: grid; grid-template-columns: 1fr 1fr; gap: 16px; }
+  @media(max-width:500px) { .form-row { grid-template-columns: 1fr; } }
+
+  .form-group { margin-bottom: 20px; }
+  label {
+    display: block; font-size: 0.85rem; font-weight: 600; color: var(--sky);
+    margin-bottom: 6px;
+  }
+  label .ko-label {
+    font-family: 'Noto Serif KR', serif;
+    font-size: 0.78rem; color: var(--earth); margin-left: 6px; font-weight: 400;
+  }
+  input, select, textarea {
+    width: 100%; padding: 12px 16px;
+    border: 1.5px solid rgba(26,58,92,0.15);
+    border-radius: 10px; font-size: 0.95rem;
+    color: var(--sky); background: #fafafa;
+    font-family: 'DM Sans', sans-serif;
+    transition: border-color 0.2s, box-shadow 0.2s;
+    outline: none;
+  }
+  input:focus, select:focus, textarea:focus {
+    border-color: var(--sky);
+    box-shadow: 0 0 0 3px rgba(26,58,92,0.08);
+    background: #fff;
+  }
+  textarea { resize: vertical; min-height: 90px; }
+
+  /* Package selector */
+  .pkg-selector { display: grid; grid-template-columns: 1fr 1fr 1fr; gap: 12px; }
+  @media(max-width:500px) { .pkg-selector { grid-template-columns: 1fr; } }
+  .pkg-option { position: relative; }
+  .pkg-option input[type="radio"] { position: absolute; opacity: 0; width: 0; }
+  .pkg-label {
+    display: block; border: 2px solid rgba(26,58,92,0.15); border-radius: 14px;
+    padding: 16px 12px; cursor: pointer; text-align: center;
+    transition: all 0.2s; background: #fafafa;
+  }
+  .pkg-option input:checked + .pkg-label {
+    border-color: var(--sky); background: rgba(26,58,92,0.05);
+    box-shadow: 0 0 0 3px rgba(26,58,92,0.08);
+  }
+  .pkg-label .pkg-name { font-weight: 700; font-size: 0.9rem; color: var(--sky); display: block; }
+  .pkg-label .pkg-price { font-size: 1.05rem; font-weight: 900; color: var(--earth); display: block; margin: 4px 0; }
+  .pkg-label .pkg-ko { font-family: 'Noto Serif KR', serif; font-size: 0.72rem; color: #888; display: block; }
+  .pkg-popular { position: absolute; top: -8px; left: 50%; transform: translateX(-50%); background: var(--sun); color: var(--sky); font-size: 0.65rem; font-weight: 800; padding: 3px 10px; border-radius: 10px; white-space: nowrap; }
+
+  /* Traveler counter */
+  .counter-group { display: flex; gap: 24px; flex-wrap: wrap; }
+  .counter-item { display: flex; align-items: center; gap: 12px; }
+  .counter-item label { margin: 0; }
+  .counter-btns { display: flex; align-items: center; gap: 8px; }
+  .counter-btn {
+    width: 32px; height: 32px; border-radius: 50%;
+    border: 1.5px solid rgba(26,58,92,0.25); background: #fff;
+    color: var(--sky); font-size: 1.2rem; font-weight: 700;
+    cursor: pointer; display: flex; align-items: center; justify-content: center;
+    transition: all 0.15s;
+  }
+  .counter-btn:hover { background: var(--sky); color: #fff; border-color: var(--sky); }
+  .counter-val { font-size: 1.1rem; font-weight: 700; color: var(--sky); min-width: 24px; text-align: center; }
+
+  /* Date picker styling */
+  input[type="date"] { cursor: pointer; }
+
+  /* Payment section */
+  .card-row { display: grid; grid-template-columns: 2fr 1fr 1fr; gap: 16px; }
+  @media(max-width:500px) { .card-row { grid-template-columns: 1fr; } }
+  .card-icons { display: flex; gap: 8px; margin-bottom: 12px; }
+  .card-icon {
+    padding: 4px 10px; border-radius: 6px; border: 1px solid #ddd;
+    font-size: 0.72rem; font-weight: 700; color: #555; background: #f5f5f5;
+  }
+  .card-icon.visa { color: #1a1f71; }
+  .card-icon.mc { color: #eb001b; }
+  .card-icon.amex { color: #2e77bc; }
+
+  /* Payment method tabs */
+  .pay-tabs { display: flex; gap: 0; margin-bottom: 20px; border-radius: 12px; overflow: hidden; border: 1.5px solid rgba(26,58,92,0.12); }
+  .pay-tab {
+    flex: 1; padding: 11px; text-align: center; cursor: pointer;
+    font-size: 0.88rem; font-weight: 600; background: #fafafa;
+    border: none; color: #888; transition: all 0.2s;
+    font-family: 'DM Sans', sans-serif;
+  }
+  .pay-tab.active { background: var(--sky); color: #fff; }
+  .pay-tab:not(.active):hover { background: #f0f0f0; }
+
+  /* Submit button */
+  .submit-btn {
+    width: 100%; padding: 18px;
+    background: linear-gradient(135deg, var(--sky), #0f2234);
+    color: #fff; border: none; border-radius: 14px;
+    font-size: 1.05rem; font-weight: 700; cursor: pointer;
+    font-family: 'DM Sans', 'Noto Serif KR', sans-serif;
+    transition: transform 0.2s, box-shadow 0.2s;
+    box-shadow: 0 6px 25px rgba(26,58,92,0.3);
+    display: flex; align-items: center; justify-content: center; gap: 10px;
+  }
+  .submit-btn:hover { transform: translateY(-2px); box-shadow: 0 10px 35px rgba(26,58,92,0.4); }
+  .submit-btn:active { transform: translateY(0); }
+  .security-note {
+    display: flex; align-items: center; justify-content: center; gap: 6px;
+    font-size: 0.78rem; color: #888; margin-top: 12px;
+  }
+
+  /* ── ORDER SUMMARY SIDEBAR ── */
+  .summary-card {
+    background: var(--sky); color: #fff;
+    border-radius: 24px; padding: 32px;
+    position: sticky; top: 90px;
+  }
+  .summary-title {
+    font-family: 'Playfair Display', serif;
+    font-size: 1.2rem; font-weight: 900;
+    color: var(--sun); margin-bottom: 4px;
+  }
+  .summary-title .ko { font-family: 'Noto Serif KR', serif; font-size: 0.72em; color: rgba(255,255,255,0.6); display: block; }
+  .summary-pkg {
+    background: rgba(255,255,255,0.08); border-radius: 12px;
+    padding: 16px; margin: 20px 0;
+    border: 1px solid rgba(255,255,255,0.12);
+  }
+  .summary-pkg .pkg-n { font-weight: 700; font-size: 1rem; color: var(--sun); }
+  .summary-pkg .pkg-dates { font-size: 0.82rem; color: rgba(255,255,255,0.6); margin-top: 4px; }
+  .summary-line { display: flex; justify-content: space-between; padding: 9px 0; font-size: 0.9rem; border-bottom: 1px solid rgba(255,255,255,0.08); }
+  .summary-line:last-of-type { border: none; }
+  .summary-line .label { color: rgba(255,255,255,0.7); }
+  .summary-line .val { font-weight: 600; }
+  .summary-total { display: flex; justify-content: space-between; align-items: baseline; margin-top: 14px; padding-top: 14px; border-top: 1.5px solid rgba(255,255,255,0.2); }
+  .summary-total .t-label { font-size: 1rem; font-weight: 700; }
+  .summary-total .t-val { font-size: 1.8rem; font-weight: 900; color: var(--sun); }
+  .deposit-note { background: rgba(245,166,35,0.12); border-radius: 10px; padding: 12px; margin-top: 16px; font-size: 0.82rem; color: rgba(255,255,255,0.75); }
+  .deposit-note strong { color: var(--sun); }
+  .inclusions { margin-top: 20px; }
+  .inclusions h4 { font-size: 0.8rem; font-weight: 700; letter-spacing: 0.1em; text-transform: uppercase; color: rgba(255,255,255,0.5); margin-bottom: 10px; }
+  .inclusions ul { list-style: none; }
+  .inclusions li { font-size: 0.85rem; color: rgba(255,255,255,0.72); padding: 4px 0; display: flex; gap: 8px; }
+  .inclusions li::before { content: '✓'; color: var(--sun); flex-shrink: 0; }
+
+  /* ── SUCCESS MODAL ── */
+  .modal-overlay {
+    display: none; position: fixed; inset: 0;
+    background: rgba(0,0,0,0.65); z-index: 1000;
+    align-items: center; justify-content: center;
+    padding: 24px;
+  }
+  .modal-overlay.show { display: flex; }
+  .modal-box {
+    background: #fff; border-radius: 28px; padding: 48px 40px;
+    max-width: 500px; width: 100%; text-align: center;
+    animation: popIn 0.4s ease;
+  }
+  @keyframes popIn { from { transform: scale(0.8); opacity: 0; } to { transform: scale(1); opacity: 1; } }
+  .modal-icon { font-size: 4rem; margin-bottom: 16px; }
+  .modal-box h2 { font-family: 'Playfair Display', serif; font-size: 2rem; color: var(--sky); margin-bottom: 8px; }
+  .modal-box .ko-modal { font-family: 'Noto Serif KR', serif; font-size: 1.1rem; color: var(--earth); display: block; margin-bottom: 16px; }
+  .modal-box p { font-size: 0.95rem; color: #666; line-height: 1.7; }
+  .modal-ref { background: var(--cream); border-radius: 12px; padding: 14px; margin: 20px 0; font-size: 0.85rem; color: #888; }
+  .modal-ref strong { color: var(--sky); font-size: 1.1rem; display: block; }
+  .modal-close {
+    margin-top: 24px; padding: 14px 40px;
+    background: var(--sky); color: #fff; border: none;
+    border-radius: 50px; font-size: 0.95rem; font-weight: 700;
+    cursor: pointer; font-family: 'DM Sans', 'Noto Serif KR', sans-serif;
+  }
+
+  /* ── LANG TOGGLE ── */
+  .en { display: inline; }
+  .ko { display: none; }
+  body.ko-mode .en { display: none !important; }
+  body.ko-mode .ko { display: inline !important; }
+  .ko-block { display: none; }
+  body.ko-mode .ko-block { display: block !important; }
+  .en-block { display: block; }
+  body.ko-mode .en-block { display: none !important; }
+
+  /* steps indicator */
+  .steps { display: flex; gap: 0; justify-content: center; margin-bottom: 28px; }
+  .step-item { display: flex; align-items: center; gap: 0; }
+  .step-circle { width: 32px; height: 32px; border-radius: 50%; background: rgba(26,58,92,0.1); color: var(--sky); display: flex; align-items: center; justify-content: center; font-size: 0.82rem; font-weight: 700; }
+  .step-circle.active { background: var(--sky); color: #fff; }
+  .step-circle.done { background: var(--jungle); color: #fff; }
+  .step-label { font-size: 0.75rem; color: #888; margin-left: 6px; }
+  .step-item.active .step-label { color: var(--sky); font-weight: 700; }
+  .step-line { width: 40px; height: 2px; background: rgba(26,58,92,0.1); margin: 0 4px; }
+  @media(max-width:400px) { .step-label { display: none; } }
+</style>
+</head>
+<body>
+
+<!-- LANG BAR -->
+<div class="lang-bar">
+  <a href="index.html" class="logo">Peru <span>EduVenture</span></a>
+  <div class="lang-btns">
+    <button class="lang-btn active" onclick="setLang('en')" id="btn-en">English</button>
+    <button class="lang-btn" onclick="setLang('ko')" id="btn-ko">한국어</button>
+  </div>
+</div>
+
+<!-- PAGE HEADER -->
+<div class="page-header">
+  <div class="breadcrumb">
+    <a href="index.html">Peru EduVenture</a> › 
+    <span class="en">Booking</span>
+    <span class="ko">예약</span>
+  </div>
+  <h1>
+    <span class="en">Reserve Your Adventure</span>
+    <span class="ko">모험을 예약하세요</span>
+  </h1>
+  <p>
+    <span class="en">Secure your spot with a 20% deposit. Balance due 60 days before departure.</span>
+    <span class="ko">20% 예약금으로 자리를 확보하세요. 잔금은 출발 60일 전까지입니다.</span>
+  </p>
+</div>
+
+<!-- BOOKING LAYOUT -->
+<div class="booking-layout">
+
+  <!-- FORM -->
+  <div class="form-card">
+
+    <!-- Steps -->
+    <div class="steps">
+      <div class="step-item active">
+        <div class="step-circle active">1</div>
+        <span class="step-label"><span class="en">Trip Details</span><span class="ko">여행 정보</span></span>
+      </div>
+      <div class="step-line"></div>
+      <div class="step-item">
+        <div class="step-circle">2</div>
+        <span class="step-label"><span class="en">Travelers</span><span class="ko">여행자</span></span>
+      </div>
+      <div class="step-line"></div>
+      <div class="step-item">
+        <div class="step-circle">3</div>
+        <span class="step-label"><span class="en">Payment</span><span class="ko">결제</span></span>
+      </div>
+    </div>
+
+    <!-- STEP 1: Trip Details -->
+    <div class="form-section">
+      <div class="form-section-title">
+        🗺 <span class="en">Select Your Package</span><span class="ko">패키지 선택</span>
+        <span class="ko-fs en-block">패키지를 선택하세요</span>
+      </div>
+      <div class="form-divider"></div>
+      <div class="pkg-selector">
+        <div class="pkg-option">
+          <input type="radio" name="package" id="pkg-explorer" value="explorer" onchange="updateSummary()">
+          <label class="pkg-label" for="pkg-explorer">
+            <span class="pkg-name">Explorer</span>
+            <span class="pkg-price">$4,800</span>
+            <span class="pkg-ko">기본 패키지</span>
+          </label>
+        </div>
+        <div class="pkg-option" style="position:relative;">
+          <div class="pkg-popular">⭐ Popular</div>
+          <input type="radio" name="package" id="pkg-premium" value="premium" checked onchange="updateSummary()">
+          <label class="pkg-label" for="pkg-premium">
+            <span class="pkg-name">Premium</span>
+            <span class="pkg-price">$6,500</span>
+            <span class="pkg-ko">프리미엄</span>
+          </label>
+        </div>
+        <div class="pkg-option">
+          <input type="radio" name="package" id="pkg-private" value="private" onchange="updateSummary()">
+          <label class="pkg-label" for="pkg-private">
+            <span class="pkg-name">Private</span>
+            <span class="pkg-price">$11,200</span>
+            <span class="pkg-ko">프라이빗</span>
+          </label>
+        </div>
+      </div>
+    </div>
+
+    <div class="form-section">
+      <div class="form-section-title">
+        📅 <span class="en">Departure Date</span><span class="ko">출발일 선택</span>
+      </div>
+      <div class="form-divider"></div>
+      <div class="form-row">
+        <div class="form-group">
+          <label>
+            <span class="en">Preferred Departure</span>
+            <span class="ko">희망 출발일</span>
+            <span class="ko-label en-block">출발일</span>
+          </label>
+          <select onchange="updateSummary()" id="dep-select">
+            <option value="june28">June 28, 2025 · 2025년 6월 28일</option>
+            <option value="july12">July 12, 2025 · 2025년 7월 12일</option>
+            <option value="july26">July 26, 2025 · 2025년 7월 26일</option>
+            <option value="aug9">August 9, 2025 · 2025년 8월 9일</option>
+          </select>
+        </div>
+        <div class="form-group">
+          <label>
+            <span class="en">Departure City</span>
+            <span class="ko">출발 도시</span>
+          </label>
+          <select>
+            <option>New York (JFK)</option>
+            <option>Los Angeles (LAX)</option>
+            <option>Miami (MIA)</option>
+            <option>Houston (IAH)</option>
+            <option>Chicago (ORD)</option>
+            <option>Washington D.C. (IAD)</option>
+            <option>Atlanta (ATL)</option>
+          </select>
+        </div>
+      </div>
+    </div>
+
+    <!-- STEP 2: Travelers -->
+    <div class="form-section">
+      <div class="form-section-title">
+        👨‍👩‍👧 <span class="en">Travelers</span><span class="ko">여행자 정보</span>
+      </div>
+      <div class="form-divider"></div>
+
+      <div class="counter-group" style="margin-bottom:24px;">
+        <div class="counter-item">
+          <label><span class="en">Adults</span><span class="ko">성인</span></label>
+          <div class="counter-btns">
+            <button class="counter-btn" onclick="changeCount('adults', -1)">−</button>
+            <span class="counter-val" id="adults-val">2</span>
+            <button class="counter-btn" onclick="changeCount('adults', 1)">+</button>
+          </div>
+        </div>
+        <div class="counter-item">
+          <label><span class="en">Children (8-16)</span><span class="ko">어린이 (8-16세)</span></label>
+          <div class="counter-btns">
+            <button class="counter-btn" onclick="changeCount('children', -1)">−</button>
+            <span class="counter-val" id="children-val">1</span>
+            <button class="counter-btn" onclick="changeCount('children', 1)">+</button>
+          </div>
+        </div>
+      </div>
+
+      <div class="form-row">
+        <div class="form-group">
+          <label>
+            <span class="en">Lead Traveler First Name</span>
+            <span class="ko">대표 여행자 이름</span>
+          </label>
+          <input type="text" placeholder="First Name / 이름">
+        </div>
+        <div class="form-group">
+          <label>
+            <span class="en">Last Name</span>
+            <span class="ko">성</span>
+          </label>
+          <input type="text" placeholder="Last Name / 성">
+        </div>
+      </div>
+      <div class="form-row">
+        <div class="form-group">
+          <label>
+            <span class="en">Email Address</span>
+            <span class="ko">이메일 주소</span>
+          </label>
+          <input type="email" placeholder="email@example.com">
+        </div>
+        <div class="form-group">
+          <label>
+            <span class="en">Phone Number</span>
+            <span class="ko">전화번호</span>
+          </label>
+          <input type="tel" placeholder="+1 (555) 000-0000">
+        </div>
+      </div>
+      <div class="form-group">
+        <label>
+          <span class="en">Children's Ages (comma separated)</span>
+          <span class="ko">자녀 나이 (쉼표로 구분)</span>
+        </label>
+        <input type="text" placeholder="e.g. 10, 13 · 예: 10, 13">
+      </div>
+      <div class="form-group">
+        <label>
+          <span class="en">Health Notes / Altitude Concerns</span>
+          <span class="ko">건강 메모 / 고산병 우려사항</span>
+        </label>
+        <textarea placeholder="Any medical conditions, allergies, or concerns for our medical team... · 의료팀에 알려주실 건강 정보를 입력해주세요..."></textarea>
+      </div>
+      <div class="form-group">
+        <label>
+          <span class="en">Preferred Language for Guide</span>
+          <span class="ko">가이드 언어 선호</span>
+        </label>
+        <select>
+          <option>English</option>
+          <option>한국어 (Korean)</option>
+          <option>English + 한국어 (Bilingual)</option>
+        </select>
+      </div>
+    </div>
+
+    <!-- STEP 3: Payment -->
+    <div class="form-section">
+      <div class="form-section-title">
+        💳 <span class="en">Payment</span><span class="ko">결제</span>
+      </div>
+      <div class="form-divider"></div>
+
+      <div class="pay-tabs">
+        <button class="pay-tab active" onclick="switchPay('card',this)">
+          <span class="en">💳 Credit Card</span><span class="ko">💳 신용카드</span>
+        </button>
+        <button class="pay-tab" onclick="switchPay('bank',this)">
+          <span class="en">🏦 Bank Transfer</span><span class="ko">🏦 계좌이체</span>
+        </button>
+        <button class="pay-tab" onclick="switchPay('kakao',this)">
+          <span class="en">💛 KakaoPay</span><span class="ko">💛 카카오페이</span>
+        </button>
+      </div>
+
+      <div id="pay-card">
+        <div class="card-icons">
+          <span class="card-icon visa">VISA</span>
+          <span class="card-icon mc">MC</span>
+          <span class="card-icon amex">AMEX</span>
+          <span class="card-icon">Discover</span>
+        </div>
+        <div class="form-group">
+          <label>
+            <span class="en">Cardholder Name</span>
+            <span class="ko">카드 소유자 이름</span>
+          </label>
+          <input type="text" placeholder="Name as on card / 카드에 표시된 이름">
+        </div>
+        <div class="form-group">
+          <label>
+            <span class="en">Card Number</span>
+            <span class="ko">카드 번호</span>
+          </label>
+          <input type="text" placeholder="0000 0000 0000 0000" maxlength="19" oninput="fmtCard(this)">
+        </div>
+        <div class="card-row">
+          <div class="form-group">
+            <label>
+              <span class="en">Expiration</span>
+              <span class="ko">유효기간</span>
+            </label>
+            <input type="text" placeholder="MM / YY" maxlength="7">
+          </div>
+          <div class="form-group">
+            <label>CVV</label>
+            <input type="text" placeholder="•••" maxlength="4">
+          </div>
+          <div class="form-group">
+            <label>
+              <span class="en">Billing ZIP</span>
+              <span class="ko">우편번호</span>
+            </label>
+            <input type="text" placeholder="ZIP / 우편번호" maxlength="10">
+          </div>
+        </div>
+      </div>
+
+      <div id="pay-bank" style="display:none;">
+        <div style="background:#f5f9ff;border-radius:12px;padding:20px;font-size:0.9rem;line-height:1.8;color:var(--sky);">
+          <strong class="en">Bank Transfer Details:</strong>
+          <strong class="ko" style="display:none;">계좌이체 정보:</strong>
+          <br>
+          <span class="en">Bank: Chase Bank · Account: Peru EduVenture LLC<br>Routing: 021000021 · Account: 756-234-8810<br>Memo: Your full name + departure date</span>
+          <span class="ko" style="display:none;">은행: Chase Bank · 계좌명: Peru EduVenture LLC<br>라우팅: 021000021 · 계좌번호: 756-234-8810<br>메모: 이름 + 출발일 입력</span>
+          <br><br>
+          <span style="font-size:0.82rem;color:#888;" class="en">Please email your transfer receipt to info@perueduventure.com</span>
+          <span style="font-size:0.82rem;color:#888;" class="ko" style="display:none;">이체 영수증을 info@perueduventure.com으로 보내주세요.</span>
+        </div>
+      </div>
+
+      <div id="pay-kakao" style="display:none;">
+        <div style="background:#FEE500;border-radius:12px;padding:24px;text-align:center;">
+          <div style="font-size:2rem;margin-bottom:10px;">💛</div>
+          <strong style="color:#3a2a00;font-size:1rem;">
+            <span class="en">Pay with KakaoPay</span>
+            <span class="ko" style="display:none;">카카오페이로 결제하기</span>
+          </strong>
+          <p style="font-size:0.85rem;color:#5a4400;margin-top:8px;" class="en">You'll be redirected to KakaoPay to complete your secure payment.</p>
+          <p style="font-size:0.85rem;color:#5a4400;margin-top:8px;" class="ko" style="display:none;">카카오페이 앱으로 이동하여 안전하게 결제를 완료합니다.</p>
+          <p style="font-size:0.82rem;color:#7a6000;margin-top:6px;">카카오톡 ID: PeruEduVenture</p>
+        </div>
+      </div>
+    </div>
+
+    <!-- TERMS -->
+    <div style="margin-bottom:24px;">
+      <label style="display:flex;align-items:flex-start;gap:10px;font-weight:400;cursor:pointer;">
+        <input type="checkbox" style="width:auto;margin-top:3px;flex-shrink:0;">
+        <span style="font-size:0.85rem;color:#666;line-height:1.6;">
+          <span class="en">I agree to the <a href="#" style="color:var(--sky);">Terms & Conditions</a>, <a href="#" style="color:var(--sky);">Cancellation Policy</a>, and confirm that all travelers' information is accurate.</span>
+          <span class="ko"><a href="#" style="color:var(--sky);">이용약관</a> 및 <a href="#" style="color:var(--sky);">취소 정책</a>에 동의하며, 모든 여행자 정보가 정확함을 확인합니다.</span>
+        </span>
+      </label>
+    </div>
+
+    <button class="submit-btn" onclick="submitBooking()">
+      <span>🏔</span>
+      <span>
+        <span class="en">Complete Booking (20% Deposit)</span>
+        <span class="ko">예약 완료 (20% 예약금)</span>
+      </span>
+    </button>
+    <p class="security-note">
+      🔒 <span class="en">256-bit SSL secured · Your payment info is safe</span>
+      <span class="ko">256비트 SSL 보안 · 결제 정보는 안전하게 보호됩니다</span>
+    </p>
+  </div>
+
+  <!-- ORDER SUMMARY SIDEBAR -->
+  <div class="summary-card">
+    <div class="summary-title">
+      Order Summary
+      <span class="ko" style="display:none;font-family:'Noto Serif KR',serif;">주문 요약</span>
+    </div>
+
+    <div class="summary-pkg">
+      <div class="pkg-n" id="sum-pkg-name">EduVenture Premium</div>
+      <div class="pkg-dates" id="sum-dates">July 12 – July 25, 2025</div>
+      <div style="font-size:0.78rem;color:rgba(255,255,255,0.45);margin-top:4px;font-family:'Noto Serif KR',serif;" id="sum-dates-ko">2025년 7월 12일 – 7월 25일</div>
+    </div>
+
+    <div class="summary-line">
+      <span class="label"><span class="en">Adults</span><span class="ko">성인</span> × <span id="sum-adults">2</span></span>
+      <span class="val" id="sum-adult-price">$13,000</span>
+    </div>
+    <div class="summary-line">
+      <span class="label"><span class="en">Children</span><span class="ko">어린이</span> × <span id="sum-children">1</span></span>
+      <span class="val" id="sum-child-price">$3,250</span>
+    </div>
+    <div class="summary-line">
+      <span class="label"><span class="en">Taxes & Fees</span><span class="ko">세금 및 수수료</span></span>
+      <span class="val" id="sum-fees">$1,625</span>
+    </div>
+    <div class="summary-total">
+      <span class="t-label"><span class="en">Total</span><span class="ko">합계</span></span>
+      <span class="t-val" id="sum-total">$17,875</span>
+    </div>
+    <div class="deposit-note">
+      <strong><span class="en">Due Today (20%): </span><span class="ko">오늘 결제 (20%): </span><span id="sum-deposit">$3,575</span></strong><br>
+      <span class="en">Remaining balance due 60 days before departure.</span>
+      <span class="ko">잔금은 출발 60일 전까지 납부해 주세요.</span>
+    </div>
+
+    <div class="inclusions">
+      <h4><span class="en">✓ Included</span><span class="ko">✓ 포함 사항</span></h4>
+      <ul>
+        <li><span class="en">Round-trip flights</span><span class="ko">왕복 항공권</span></li>
+        <li><span class="en">All accommodation</span><span class="ko">전 숙박</span></li>
+        <li><span class="en">All meals</span><span class="ko">전 식사</span></li>
+        <li><span class="en">Expert bilingual guide</span><span class="ko">전문 이중언어 가이드</span></li>
+        <li><span class="en">Medical team support</span><span class="ko">의료팀 지원</span></li>
+        <li><span class="en">Pre-trip edu kit</span><span class="ko">사전 교육 키트</span></li>
+        <li><span class="en">Airport transfers</span><span class="ko">공항 이동</span></li>
+        <li><span class="en">Travel insurance</span><span class="ko">여행자 보험</span></li>
+      </ul>
+    </div>
+
+    <div style="margin-top:20px;padding:14px;background:rgba(255,255,255,0.06);border-radius:12px;font-size:0.8rem;color:rgba(255,255,255,0.5);text-align:center;">
+      <span class="en">Questions? Chat with us:<br>💬 KakaoTalk: PeruEdu<br>📧 info@perueduventure.com</span>
+      <span class="ko">문의사항이 있으신가요?<br>💬 카카오톡: PeruEdu<br>📧 info@perueduventure.com</span>
+    </div>
+  </div>
+</div>
+
+<!-- SUCCESS MODAL -->
+<div class="modal-overlay" id="modal">
+  <div class="modal-box">
+    <div class="modal-icon">🎉</div>
+    <h2><span class="en">Booking Confirmed!</span><span class="ko">예약 완료!</span></h2>
+    <span class="ko-modal">
+      <span class="en">Your Peru adventure awaits!</span>
+      <span class="ko">페루 모험이 시작됩니다!</span>
+    </span>
+    <p>
+      <span class="en">Your reservation has been received. A confirmation email will be sent within 24 hours with your pre-trip education kit and next steps.</span>
+      <span class="ko">예약이 접수되었습니다. 24시간 내에 사전 교육 키트와 다음 단계 안내가 이메일로 발송됩니다.</span>
+    </p>
+    <div class="modal-ref">
+      <span class="en">Booking Reference</span>
+      <span class="ko">예약 번호</span>
+      <strong id="booking-ref">PEV-2025-XXXXXX</strong>
+    </div>
+    <button class="modal-close" onclick="closeModal()">
+      <span class="en">Start Learning About Peru 🏔</span>
+      <span class="ko">페루 사전 학습 시작하기 🏔</span>
+    </button>
+  </div>
+</div>
+
+<script>
+  const prices = { explorer: 4800, premium: 6500, private: 11200 };
+  const pkgNames = { explorer: 'Family Explorer', premium: 'EduVenture Premium', private: 'Private Family' };
+  const pkgNamesKo = { explorer: '기본 패키지', premium: '프리미엄 패키지', private: '프라이빗 패키지' };
+  const dates = {
+    june28: { en: 'June 28 – July 11, 2025', ko: '2025년 6월 28일 – 7월 11일' },
+    july12: { en: 'July 12 – July 25, 2025', ko: '2025년 7월 12일 – 7월 25일' },
+    july26: { en: 'July 26 – Aug 8, 2025', ko: '2025년 7월 26일 – 8월 8일' },
+    aug9:   { en: 'Aug 9 – Aug 22, 2025', ko: '2025년 8월 9일 – 8월 22일' },
+  };
+
+  let adults = 2, children = 1;
+
+  function changeCount(type, delta) {
+    if(type === 'adults') { adults = Math.max(1, adults + delta); document.getElementById('adults-val').textContent = adults; }
+    if(type === 'children') { children = Math.max(0, children + delta); document.getElementById('children-val').textContent = children; }
+    updateSummary();
+  }
+
+  function updateSummary() {
+    const pkg = document.querySelector('input[name="package"]:checked').value;
+    const depVal = document.getElementById('dep-select').value;
+    const price = prices[pkg];
+    const childPrice = Math.round(price * 0.5);
+    const adultTotal = adults * price;
+    const childTotal = children * childPrice;
+    const fees = Math.round((adultTotal + childTotal) * 0.1);
+    const total = adultTotal + childTotal + fees;
+    const deposit = Math.round(total * 0.2);
+
+    document.getElementById('sum-pkg-name').textContent = pkgNames[pkg] + ' · ' + pkgNamesKo[pkg];
+    document.getElementById('sum-dates').textContent = dates[depVal].en;
+    document.getElementById('sum-dates-ko').textContent = dates[depVal].ko;
+    document.getElementById('sum-adults').textContent = adults;
+    document.getElementById('sum-children').textContent = children;
+    document.getElementById('sum-adult-price').textContent = '$' + adultTotal.toLocaleString();
+    document.getElementById('sum-child-price').textContent = '$' + childTotal.toLocaleString();
+    document.getElementById('sum-fees').textContent = '$' + fees.toLocaleString();
+    document.getElementById('sum-total').textContent = '$' + total.toLocaleString();
+    document.getElementById('sum-deposit').textContent = '$' + deposit.toLocaleString();
+  }
+
+  function switchPay(method, btn) {
+    document.querySelectorAll('.pay-tab').forEach(b => b.classList.remove('active'));
+    btn.classList.add('active');
+    document.getElementById('pay-card').style.display = method === 'card' ? 'block' : 'none';
+    document.getElementById('pay-bank').style.display = method === 'bank' ? 'block' : 'none';
+    document.getElementById('pay-kakao').style.display = method === 'kakao' ? 'block' : 'none';
+  }
+
+  function fmtCard(el) {
+    let v = el.value.replace(/\D/g,'').substring(0,16);
+    el.value = v.replace(/(.{4})/g,'$1 ').trim();
+  }
+
+  function submitBooking() {
+    const ref = 'PEV-2025-' + Math.random().toString(36).substring(2,8).toUpperCase();
+    document.getElementById('booking-ref').textContent = ref;
+    document.getElementById('modal').classList.add('show');
+  }
+
+  function closeModal() {
+    document.getElementById('modal').classList.remove('show');
+    window.location.href = 'index.html';
+  }
+
+  function setLang(lang) {
+    document.body.classList.toggle('ko-mode', lang === 'ko');
+    document.getElementById('btn-en').classList.toggle('active', lang === 'en');
+    document.getElementById('btn-ko').classList.toggle('active', lang === 'ko');
+    // also handle ko/en within summary sidebar
+    document.querySelectorAll('.summary-card .ko').forEach(el => {
+      el.style.display = lang === 'ko' ? 'block' : 'none';
+    });
+    document.querySelectorAll('.pay-bank .ko, .pay-kakao .ko').forEach(el => {
+      el.style.display = lang === 'ko' ? 'block' : 'none';
+    });
+    document.querySelectorAll('.pay-bank .en, .pay-kakao .en').forEach(el => {
+      el.style.display = lang === 'ko' ? 'none' : 'inline';
+    });
+  }
+
+  // init
+  updateSummary();
+</script>
+</body>
+</html>
