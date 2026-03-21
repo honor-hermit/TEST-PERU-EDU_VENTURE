@@ -348,12 +348,12 @@
 
   /* ── LANG DISPLAY ── */
   .en { display: block; }
-  .ko { display: none; }
+  .ko { display: none !important; }
   body.ko-mode .en { display: none !important; }
   body.ko-mode .ko { display: block !important; }
   body.ko-mode .ko-inline { display: inline !important; }
   body.ko-mode .en-inline { display: none !important; }
-  .ko-inline { display: none; }
+  .ko-inline { display: none !important; }
   .en-inline { display: inline; }
 
   /* Keep both visible elements where both needed */
