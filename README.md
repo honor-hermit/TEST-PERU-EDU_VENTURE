@@ -1,4 +1,4 @@
-
+<!DOCTYPE html>
 <html lang="en">
 <head>
 <meta charset="UTF-8">
@@ -32,12 +32,28 @@
   /* ── LANGUAGE TOGGLE ── */
   .lang-bar {
     position: fixed; top: 0; left: 0; right: 0; z-index: 999;
-    display: flex; justify-content: flex-end; align-items: center;
+    display: flex; justify-content: space-between; align-items: center;
     padding: 12px 32px;
     background: rgba(26,58,92,0.92);
     backdrop-filter: blur(10px);
     gap: 12px;
   }
+  .lang-bar-left { display: flex; align-items: center; }
+  .concept-btn {
+    display: flex; align-items: center; gap: 8px;
+    background: rgba(245,166,35,0.15);
+    border: 1.5px solid rgba(245,166,35,0.5);
+    color: var(--sun); padding: 6px 18px; border-radius: 20px;
+    font-size: 0.82rem; font-weight: 700; cursor: pointer;
+    letter-spacing: 0.04em; text-decoration: none;
+    transition: all 0.25s; white-space: nowrap;
+    font-family: 'DM Sans', 'Noto Serif KR', sans-serif;
+  }
+  .concept-btn:hover { background: var(--sun); color: var(--sky); border-color: var(--sun); }
+  .concept-btn .dot { width: 7px; height: 7px; border-radius: 50%; background: var(--sun); flex-shrink:0; animation: blink 1.8s infinite; }
+  .concept-btn:hover .dot { background: var(--sky); }
+  @keyframes blink { 0%,100%{opacity:1;transform:scale(1)} 50%{opacity:0.4;transform:scale(1.5)} }
+  .lang-bar-right { display: flex; gap: 12px; align-items: center; }
   .lang-btn {
     background: none; border: 1.5px solid rgba(255,255,255,0.4);
     color: #fff; padding: 5px 16px; border-radius: 20px;
@@ -356,9 +372,18 @@
 
 <!-- LANG BAR -->
 <div class="lang-bar">
-  <span style="color:rgba(255,255,255,0.6);font-size:0.82rem;">🌐</span>
-  <button class="lang-btn active" onclick="setLang('en')" id="btn-en">English</button>
-  <button class="lang-btn" onclick="setLang('ko')" id="btn-ko">한국어</button>
+  <div class="lang-bar-left">
+    <a href="concept.html" class="concept-btn">
+      <span class="dot"></span>
+      <span class="en-inline">What is Edu-Vacance?</span>
+      <span class="ko-inline">에듀바캉스란?</span>
+    </a>
+  </div>
+  <div class="lang-bar-right">
+    <span style="color:rgba(255,255,255,0.6);font-size:0.82rem;">🌐</span>
+    <button class="lang-btn active" onclick="setLang('en')" id="btn-en">English</button>
+    <button class="lang-btn" onclick="setLang('ko')" id="btn-ko">한국어</button>
+  </div>
 </div>
 
 <!-- HERO -->
@@ -531,6 +556,49 @@
         </div>
       </div>
     </div>
+  </div>
+</section>
+
+<!-- 360° VIRTUAL TOUR -->
+<section style="background:#0f1e2e; padding:80px 24px;">
+  <div class="container">
+    <div class="section-label" style="color:var(--sun);">360° Virtual Tour · 360° 가상 투어</div>
+    <h2 class="section-title" style="color:#fff; margin-bottom:10px;">
+      <span class="en-inline">Step Inside Machu Picchu — Before You Go</span>
+      <span class="ko-inline">떠나기 전, 마추픽추를 미리 경험하세요</span>
+    </h2>
+    <p class="section-desc" style="color:rgba(255,255,255,0.65); margin-bottom:36px;">
+      <span class="en-inline">Explore the ancient Inca citadel in full 360° panorama. Drag to look around — this is what awaits you on Day 6 of your adventure.</span>
+      <span class="ko-inline">고대 잉카 유적지를 360° 파노라마로 탐험해보세요. 드래그하여 주변을 둘러보세요 — 6일차에 직접 만나게 될 풍경입니다.</span>
+    </p>
+    <div style="
+      border-radius: 20px;
+      overflow: hidden;
+      box-shadow: 0 20px 60px rgba(0,0,0,0.5);
+      border: 1.5px solid rgba(255,255,255,0.1);
+      max-width: 760px;
+      margin: 0 auto;
+    ">
+      <iframe
+        width="100%"
+        height="450"
+        src="https://www.airpano.com/embed.php?3D=machu-picchu-peru"
+        frameborder="0"
+        marginheight="0"
+        marginwidth="0"
+        scrolling="no"
+        framespacing="0"
+        allowfullscreen
+        style="display:block;">
+      </iframe>
+    </div>
+    <div style="text-align:right; max-width:760px; margin:10px auto 0; font-size:0.78rem; color:rgba(255,255,255,0.35);">
+      Courtesy of <a href="https://www.airpano.com/" target="_blank" style="color:var(--gold); text-decoration:none;">www.AirPano.ru</a>
+    </div>
+    <p style="text-align:center; margin-top:20px; font-size:0.88rem; color:rgba(255,255,255,0.45);">
+      <span class="en-inline">🖱 Click and drag to explore · Scroll to zoom · Best viewed fullscreen</span>
+      <span class="ko-inline">🖱 클릭 후 드래그로 탐험 · 스크롤로 줌 · 전체화면으로 보면 더 좋아요</span>
+    </p>
   </div>
 </section>
 
@@ -794,18 +862,11 @@
   <strong>Peru EduVenture</strong> · Educational Travel Specialists
   <span class="ko-footer">페루 에듀벤처 · 교육 여행 전문</span>
   <p style="margin-top:14px;font-size:0.8rem;">
-    📧 info@perueduenture.com &nbsp;|&nbsp; 📞 +1 (800) 555-PERU &nbsp;|&nbsp; 💬 카카오톡: PeruEdu
+    📧 <a href="/cdn-cgi/l/email-protection" class="__cf_email__" data-cfemail="60090e060f2010051215050415050e141512054e030f0d">[email&#160;protected]</a> &nbsp;|&nbsp; 📞 +1 (800) 555-PERU &nbsp;|&nbsp; 💬 카카오톡: PeruEdu
   </p>
   <p style="margin-top:10px;font-size:0.75rem;opacity:0.55;">© 2025 Peru EduVenture LLC. All rights reserved. · 모든 권리 보유.</p>
 </footer>
 
-<script>
+<script data-cfasync="false" src="/cdn-cgi/scripts/5c5dd728/cloudflare-static/email-decode.min.js"></script><script>
 function setLang(lang) {
-  document.body.classList.toggle('ko-mode', lang === 'ko');
-  document.getElementById('btn-en').classList.toggle('active', lang === 'en');
-  document.getElementById('btn-ko').classList.toggle('active', lang === 'ko');
-}
-</script>
-</body>
-</html>
-
+  document.bo
